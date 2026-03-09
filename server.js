@@ -60,7 +60,7 @@ function replyWithTvs(message) {
 }
 
 function replyWithOrder(tvId, name, price) {
-      let token = "KEzeEFUA";
+      let token = "VipUkIFc";
   const checkoutUrl =
     "https://spdpone.syfpos.com/mppcore/d2d/" +token;
 
