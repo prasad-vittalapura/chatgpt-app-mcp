@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TV Recommendations</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f5f7fb;
+        --card: #ffffff;
+        --text: #111827;
+        --muted: #667085;
+        --border: #e6eaf2;
+        --primary: #2563eb;
+        --primary-hover: #1d4ed8;
+        --shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        padding: 0;
+        width: 100%;
+        height: 100vh;
+        background: transparent;
+      }
+
+      .widget {
+        width: 100%;
+        height: 100vh;
+        margin: 0;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 20px;
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .title-wrap {
+        min-width: 0;
+      }
+
+      .eyebrow {
+        margin: 0 0 4px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--primary);
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 1.1rem;
+        line-height: 1.2;
+      }
+
+      .subtext {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      .badge {
+        flex-shrink: 0;
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: #eef4ff;
+        color: var(--primary);
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+
+      .tv-list {
+        list-style: none;
+        display: flex;
+        gap: 12px;
+        margin: 0;
+        padding: 2px 2px 6px;
+        overflow-x: auto;
+        scroll-snap-type: x proximity;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .tv-list::-webkit-scrollbar {
+        height: 8px;
+      }
+
+      .tv-list::-webkit-scrollbar-thumb {
+        background: #d8dfeb;
+        border-radius: 999px;
+      }
+
+      .tv-card {
+        flex: 0 0 220px;
+        scroll-snap-align: start;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .tv-image-wrap {
+        width: 100%;
+        height: 124px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #eef2f7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .tv-image {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+        display: block;
+        background: #eef2f7;
+      }
+
+      .tv-details {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-height: 88px;
+      }
+
+      .tv-name-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .tv-name {
+        font-weight: 700;
+        font-size: 0.98rem;
+        line-height: 1.3;
+      }
+
+      .tv-price {
+        flex-shrink: 0;
+        color: var(--primary);
+        font-weight: 800;
+        font-size: 0.98rem;
+      }
+
+      .tv-description {
+        color: var(--muted);
+        font-size: 0.85rem;
+        line-height: 1.4;
+      }
+
+      .checkout-btn {
+        width: 100%;
+        border: none;
+        border-radius: 12px;
+        background: var(--primary);
+        color: white;
+        font-weight: 700;
+        font-size: 0.92rem;
+        padding: 11px 14px;
+        cursor: pointer;
+        transition: background 0.18s ease, transform 0.18s ease;
+      }
+
+      .checkout-btn:hover {
+        background: var(--primary-hover);
+      }
+
+      .checkout-btn:active {
+        transform: translateY(1px);
+      }
+
+      .empty-state {
+        border: 1px dashed var(--border);
+        border-radius: 14px;
+        padding: 18px 14px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 420px) {
+        body {
+          padding: 8px;
+        }
+
+        .widget {
+          padding: 14px;
+          border-radius: 18px;
+        }
+
+        .tv-card {
+          flex-basis: 205px;
+        }
+
+        .tv-image-wrap {
+          height: 110px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="widget" aria-label="TV Recommendations widget">
+      <div class="header">
+        <div class="title-wrap">
+          <p class="eyebrow">Top Picks</p>
+          <h2>TV Recommendations</h2>
+          <p class="subtext">Swipe to compare the best options.</p>
+        </div>
+        <div class="badge" id="count-badge">3 TVs</div>
+      </div>
+
+      <ul class="tv-list" id="tv-list" aria-live="polite"></ul>
+      <div class="empty-state" id="empty-state" hidden>
+        No recommendations available yet.
+      </div>
+    </main>
+
+    <script type="module">
+      const listEl = document.querySelector("#tv-list");
+      const emptyEl = document.querySelector("#empty-state");
+      const countBadgeEl = document.querySelector("#count-badge");
+
+      let tvs = [
+        
+      ];
+
+      const escapeText = (value) => String(value ?? "").trim();
+
+      const getImageSrc = (tv) =>
+        escapeText(tv.image) ||
+        `https://via.placeholder.com/400x240?text=${encodeURIComponent(tv.name || "TV")}`;
+
+      const updateCount = () => {
+        const count = tvs.length;
+        countBadgeEl.textContent = `${count} TV${count === 1 ? "" : "s"}`;
+      };
+
+     const  handleCheckout = async (tv) => {
+        console.log("Checkout clicked for:", tv.name);
+
+        try {
+          const result = await rpcRequest("tools/call", {
+            name: "create_order",
+            arguments: {
+              tvId: tv.id,
+              name: tv.name,
+              price: tv.price
+            }
+          });
+
+          console.log("Tool result:", result);
+
+          const checkoutUrl =
+            result?.structuredContent?.order?.checkoutUrl;
+          if (checkoutUrl) {
+            if (window.openai?.openExternal) {
+              await window.openai.openExternal({ href: checkoutUrl });
+            } else {
+              window.open(checkoutUrl, "_blank", "noopener,noreferrer");
+            }
+          }
+        } catch (err) {
+          console.error("create_order failed:", err);
+        }
+      };
+
+
+      const render = () => {
+        console.log("Rendering TVs:", tvs);
+        listEl.innerHTML = "";
+        updateCount();
+
+        if (!tvs.length) {
+          emptyEl.hidden = false;
+          listEl.hidden = true;
+          return;
+        }
+
+        emptyEl.hidden = true;
+        listEl.hidden = false;
+
+        tvs.forEach((tv) => {
+          const li = document.createElement("li");
+          li.className = "tv-card";
+
+          const imgWrap = document.createElement("div");
+          imgWrap.className = "tv-image-wrap";
+
+          const imgEl = document.createElement("img");
+          imgEl.className = "tv-image";
+          imgEl.src = getImageSrc(tv);
+          imgEl.alt = escapeText(tv.name) || "TV image";
+          imgEl.loading = "lazy";
+          imgEl.onerror = () => {
+            imgEl.src = `https://via.placeholder.com/400x240?text=${encodeURIComponent(
+              tv.name || "TV"
+            )}`;
+          };
+
+          imgWrap.appendChild(imgEl);
+
+          const detailsEl = document.createElement("div");
+          detailsEl.className = "tv-details";
+
+          const nameRowEl = document.createElement("div");
+          nameRowEl.className = "tv-name-row";
+
+          const nameEl = document.createElement("div");
+          nameEl.className = "tv-name";
+          nameEl.textContent = escapeText(tv.name) || "Unknown TV";
+
+          const priceEl = document.createElement("div");
+          priceEl.className = "tv-price";
+          priceEl.textContent = escapeText(tv.price) || "—";
+
+          const descEl = document.createElement("div");
+          descEl.className = "tv-description";
+          descEl.textContent =
+            escapeText(tv.description) || "A reliable TV option for your living room.";
+
+          const button = document.createElement("button");
+          button.className = "checkout-btn";
+          button.type = "button";
+          button.textContent = "Instant Checkout";
+          button.addEventListener("click", () => {
+            handleCheckout(tv);
+          });
+
+          nameRowEl.appendChild(nameEl);
+          nameRowEl.appendChild(priceEl);
+          detailsEl.appendChild(nameRowEl);
+          detailsEl.appendChild(descEl);
+
+          li.appendChild(imgWrap);
+          li.appendChild(detailsEl);
+          li.appendChild(button);
+          listEl.appendChild(li);
+        });
+      };
+
+      const updateFromResponse = (response) => {
+        console.log("Updating from response:", response);
+        if (response?.structuredContent?.tvs && Array.isArray(response.structuredContent.tvs)) {
+          tvs = response.structuredContent.tvs;
+          render();
+        }
+      };
+
+      let rpcId = 0;
+      const pendingRequests = new Map();
+
+      const rpcNotify = (method, params) => {
+        window.parent.postMessage({ jsonrpc: "2.0", method, params }, "*");
+      };
+
+      const rpcRequest = (method, params) =>
+        new Promise((resolve, reject) => {
+          const id = ++rpcId;
+          console.log("Sending RPC request:", method, params, "with id:", id);
+          pendingRequests.set(id, { resolve, reject });
+          window.parent.postMessage({ jsonrpc: "2.0", id, method, params }, "*");
+        });
+
+      window.addEventListener(
+        "message",
+        (event) => {
+          console.log("Received message event:", event);
+          if (event.source !== window.parent) return;
+          const message = event.data;
+          if (!message || message.jsonrpc !== "2.0") return;
+
+          console.log("Processing JSON-RPC message:", message);
+
+          if (typeof message.id === "number") {
+            const pending = pendingRequests.get(message.id);
+            if (!pending) return;
+            pendingRequests.delete(message.id);
+
+            if (message.error) {
+              console.error("RPC error:", message.error);
+              pending.reject(message.error);
+              return;
+            }
+
+            console.log("RPC response:", message.result);
+            pending.resolve(message.result);
+            return;
+          }
+
+          if (typeof message.method !== "string") return;
+          if (message.method === "ui/notifications/tool-result") {
+            console.log("Received tool result notification:", message.params);
+            updateFromResponse(message.params);
+          }
+        },
+        { passive: true }
+      );
+
+      const initializeBridge = async () => {
+        console.log("Initializing MCP Apps bridge");
+        const appInfo = { name: "tv-widget", version: "0.2.0" };
+        const appCapabilities = {checkout : true};
+        const protocolVersion = "2026-01-26";
+
+        try {
+          await rpcRequest("ui/initialize", {
+            appInfo,
+            appCapabilities,
+            protocolVersion,
+          });
+          console.log("Bridge initialized successfully");
+          rpcNotify("ui/notifications/initialized", {});
+        } catch (error) {
+          console.error("Failed to initialize the MCP Apps bridge:", error);
+        }
+      };
+
+      initializeBridge();
+      console.log("Initial render called");
+      render();
+    </script>
+  </body>
+</html>
