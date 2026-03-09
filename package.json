@@ -1,7 +1,7 @@
 {
   "type": "module",
   "scripts": {
-    "build": "echo 'Build successful'"
+    "build": "npm install && echo 'Build successful'"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.20.2",
