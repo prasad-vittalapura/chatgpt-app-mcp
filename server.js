@@ -41,6 +41,9 @@ const tvs = [
 // in-memory token store
 const tokenStore = new Set();
 
+// global session ID
+let globalSessionId = 'SK7IoFbh';
+
 // --------------------
 // SCHEMAS
 // --------------------
@@ -96,7 +99,7 @@ function replyWithTvs() {
 }
 
 function createOrderResponse(tv) {
-  const sessionId = `SK7IoFbh`;
+  const sessionId = globalSessionId;
   const checkoutUrl = `https://qpdpone.syfpos.com/mppcore/d2d/${sessionId}`;
 
   return {
@@ -354,6 +357,36 @@ const httpServer = createServer(async (req, res) => {
     return;
   }
 
+  // POST /api/session
+  // body: { "sessionId": "abc123" }
+  if (url.pathname === "/api/session" && req.method === "POST") {
+    try {
+      const data = await readJsonBody(req);
+      const sessionId = data?.sessionId;
+
+      if (!sessionId || typeof sessionId !== "string") {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "sessionId is required" }));
+        return;
+      }
+
+      globalSessionId = sessionId;
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify({
+          message: "Session ID stored successfully",
+          sessionId,
+        })
+      );
+      return;
+    } catch (error) {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Invalid JSON body" }));
+      return;
+    }
+  }
+
   // MCP endpoint
   if (url.pathname === MCP_PATH) {
     const server = createTvServer();
@@ -381,4 +414,5 @@ httpServer.listen(port, () => {
   console.log(
     `GET endpoint: http://localhost:${port}${TOKEN_API_PATH}?tokenId=your-token`
   );
+  console.log(`POST session endpoint: http://localhost:${port}/api/session`);
 });
