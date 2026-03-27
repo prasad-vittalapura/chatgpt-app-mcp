@@ -4,8 +4,9 @@
     "build": "npm install && echo 'Build successful'"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.20.2",
     "@modelcontextprotocol/ext-apps": "^1.0.1",
+    "@modelcontextprotocol/sdk": "^1.20.2",
+    "ws": "^8.20.0",
     "zod": "^3.25.76"
   }
 }

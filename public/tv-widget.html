@@ -259,27 +259,32 @@
 
      const  handleCheckout = async (tv) => {
         console.log("Checkout clicked for:", tv.name);
-
         try {
           const result = await rpcRequest("tools/call", {
             name: "create_order",
-            arguments: {
-              tvId: tv.id,
-              name: tv.name,
-              price: tv.price
-            }
+            arguments: {tvId: tv.id},
           });
 
+          
           console.log("Tool result:", result);
 
           const checkoutUrl =
             result?.structuredContent?.order?.checkoutUrl;
+          const sessionId= result?.structuredContent?.order?.sessionId;
           if (checkoutUrl) {
             if (window.openai?.openExternal) {
-              await window.openai.openExternal({ href: checkoutUrl });
+              window.openai.openExternal({ href: checkoutUrl });
+              window.openai.sendFollowUpMessage({
+              prompt: "User is intrestd to buy " + tv.name + ". and We inishiated checkout session. Invoke load_checkout_session tool with sessionId is  " + sessionId + " to load the checkout session in the widget and wait for the payment confirmation.",
+              scollToBottom: true,
+        })
+              //  await window.openai.requestModal({
+            //   template: "ui://widget/order.html",
+            // });
             } else {
               window.open(checkoutUrl, "_blank", "noopener,noreferrer");
             }
+            
           }
         } catch (err) {
           console.error("create_order failed:", err);
@@ -343,7 +348,7 @@
           const button = document.createElement("button");
           button.className = "checkout-btn";
           button.type = "button";
-          button.textContent = "Instant Checkout";
+          button.textContent = "Buy Now";
           button.addEventListener("click", () => {
             handleCheckout(tv);
           });
