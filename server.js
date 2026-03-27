@@ -96,8 +96,8 @@ function replyWithTvs() {
 }
 
 function createOrderResponse(tv) {
-  const sessionId = `gPkJLTRa`;
-  const checkoutUrl = `https://spdpone.syfpos.com/mppcore/d2d/${sessionId}`;
+  const sessionId = `SK7IoFbh`;
+  const checkoutUrl = `https://qpdpone.syfpos.com/mppcore/d2d/${sessionId}`;
 
   return {
     content: [
@@ -119,7 +119,7 @@ function createOrderResponse(tv) {
 }
 
 function loadCheckoutSessionResponse(sessionId) {
-  const checkoutUrl = `https://spdpone.syfpos.com/mppcore/d2d/${sessionId}`;
+  const checkoutUrl = `https://qpdpone.syfpos.com/mppcore/d2d/${sessionId}`;
 
   return {
     content: [
@@ -184,7 +184,7 @@ function createTvServer() {
                 "https://images.unsplash.com"
               ],
               redirect_domains: [
-                "https://spdpone.syfpos.com"
+                "https://qpdpone.syfpos.com"
               ]
             }
           }
