@@ -96,7 +96,7 @@ function replyWithTvs() {
 }
 
 function createOrderResponse(tv) {
-  const sessionId = `BbPIegjZ`;
+  const sessionId = `KpiqLYjU`;
   const checkoutUrl = `https://spdpone.syfpos.com/mppcore/d2d/${sessionId}`;
 
   return {
@@ -276,6 +276,7 @@ function createTvServer() {
 const port = 8787;
 const MCP_PATH = "/mcp";
 const TOKEN_API_PATH = "/api/token";
+const TOKEN_FLUSH = "/api/token/flush";
 
 // --------------------
 // HTTP SERVER
@@ -341,6 +342,14 @@ const httpServer = createServer(async (req, res) => {
     }
 
     res.writeHead(204);
+    res.end();
+    return;
+  }
+
+  // GET /api/token?tokenId=abc123
+  if (url.pathname === TOKEN_FLUSH&& req.method === "GET") {
+    tokenStore.clear();
+    res.writeHead(200);
     res.end();
     return;
   }
